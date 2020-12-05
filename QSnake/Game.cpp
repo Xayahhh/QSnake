@@ -31,7 +31,7 @@ void Game::Initialize(){       //目前暂时直接调出一个游戏组件，�
     isRunning = true;
     stopAfter = -100;
     playerNum = mPlayers.length();
-    unPause();
+    Paused = false;
     if (gameWidget){
         connect(gameWidget, &GameWidget::keyPressSignal, this, &Game::keyPress);
         connect(gameWidget, &GameWidget::keyReleaseSignal, this, &Game::keyRelease);
@@ -146,7 +146,7 @@ void Game::save(){
 }
 void Game::load(){
     QFile file("history.snk");
-    file.open(QIODevice::ReadOnly);
+    if(!file.open(QIODevice::ReadOnly))return;
     QString info;
 
     info = file.readLine();
