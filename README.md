@@ -21,11 +21,11 @@ Use QT to complete UI. It is used for teachers and TAs to grade my course.
 ### Game Objects
   #### Blocks
   1. **Basic Block**:
-    Usually deep red. Cannot automatically move. Snake will be destroyed when hit on it. 
+    Usually deep red. Cannot automatically move. Snake will be destroyed on hitting it. 
   2. **Snake Body**:
-    Usually black. Move with snake. Snake will be destroyed when hit on it. 
+    Usually black. Move with snake. Snake will be destroyed on hitting it. 
   3. **Food Generator**:
-    Usually green. Cannot automatically move. Snake will be destroyed when hit on it. 
+    Usually green. Cannot automatically move. Snake will be destroyed on hitting it. 
     Each Food Generator will always provide three Basic Food,and provide one Speed Up Food for every 10s, one Life Up Food every 25s, one Score Bonus Food every 20s.
   #### Snake
   1. **Player Snake**:
