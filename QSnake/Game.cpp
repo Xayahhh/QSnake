@@ -9,7 +9,7 @@
 
 #include "Game.h"
 
-Game::Game()     //直接调用初始化函数，不多bb
+Game::Game()     //直接调用初始化函数
     :QThread(0){
 }
 Game::~Game(){
@@ -50,7 +50,6 @@ void Game::ProcessInput(){      //遍历所有对象响应输入
 }
 
 void Game::Update(){      //遍历更新所有对象
-
     int deltaTime = timer->elapsed();
     while(deltaTime < 10){
         deltaTime = timer->elapsed();
@@ -146,7 +145,10 @@ void Game::save(){
 }
 void Game::load(){
     QFile file("history.snk");
-    if(!file.open(QIODevice::ReadOnly))return;
+    if(!file.open(QIODevice::ReadOnly)){
+        return;
+    }
+
     QString info;
 
     info = file.readLine();
@@ -158,10 +160,22 @@ void Game::load(){
         if (list[0] == "Block")
             addBlock(new Block(this, list[1].toFloat(), list[2].toFloat(), list[5].toInt(), list[6].toInt(), QColor(list[7].toInt(),list[8].toInt(),list[9].toInt())));
         if (list[0] == "Snake"){
-            Player* p = new Snake(this, list[1].toFloat(), list[2].toFloat(), list[5].toInt(), list[6].toInt(), QColor(list[7].toInt(),list[8].toInt(),list[9].toInt()));
+            Snake* p = new Snake(this, list[1].toFloat(), list[2].toFloat(), list[5].toInt(), list[6].toInt(), QColor(list[7].toInt(),list[8].toInt(),list[9].toInt()), qAbs(list[3].toFloat()+list[4].toFloat()));
             addBeing(p);
             addPlayer(p);
             p->setVel(list[3].toFloat(), list[4].toFloat());
+            if (list[3].toFloat()) p->setMVel(qAbs(list[3].toFloat()));
+            else p->setMVel(qAbs(list[4].toFloat()));
+            if (mPlayers.length() == 2) p->setKeys("Up", "Down", "Left", "Right");
+        }
+        if (list[0] == "AISnake"){
+            AISnake* p = new AISnake(this, list[1].toFloat(), list[2].toFloat(), list[5].toInt(), list[6].toInt(), QColor(list[7].toInt(),list[8].toInt(),list[9].toInt()), qAbs(list[3].toFloat()+list[4].toFloat()));
+            addBeing(p);
+            addPlayer(p);
+            p->setVel(list[3].toFloat(), list[4].toFloat());
+            if (list[3].toFloat()) p->setMVel(qAbs(list[3].toFloat()));
+            else p->setMVel(qAbs(list[4].toFloat()));
+            if (mPlayers.length() == 2) p->setKeys("Up", "Down", "Left", "Right");
         }
         if (list[0] == "SnakeBody"){
             SnakeBody* body = new SnakeBody(this, list[1].toFloat(), list[2].toFloat(), list[5].toInt(), list[6].toInt(), QColor(list[7].toInt(),list[8].toInt(),list[9].toInt()));

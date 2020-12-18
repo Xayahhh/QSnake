@@ -1,0 +1,35 @@
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include <QWidget>
+#include <QPainter>
+
+class GameWidget : public QWidget{
+    Q_OBJECT
+
+public:
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+    
+private:
+    QWidget* widget;
+    QPainter* painter;
+    
+};
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+    
+private:
+    GameWidget* widget;
+    QPainter* painter;
+};
+
+
+#endif // MAINWINDOW_H

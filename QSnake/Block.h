@@ -16,8 +16,8 @@ private:
     bool isHard; //软硬
     bool isBreakable, isCrossable; //能否被破坏、穿越
 
-    class SizeController* LTSC,* RTSC,* RBSC,* LBSC;
 protected:
+    class SizeController* LTSC,* RTSC,* RBSC,* LBSC;
 public:
     virtual void* getPtr() override{return (Block*)this;}
 

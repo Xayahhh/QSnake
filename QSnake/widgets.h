@@ -20,8 +20,10 @@
 #include <QFormLayout>
 #include <QFontDatabase>
 #include <QLabel>
+#include <QLineEdit>
 #include "Object.h"
 #include "Game.h"
+
 
 class GameWidget : public QScrollArea{  //游戏组件，是承载游戏画面的容器
     Q_OBJECT
@@ -88,7 +90,6 @@ private:
     QLabel* typeName,* info, * position, *sizeLabel, *health;
 };
 
-
 class MainWindow : public QMainWindow      //主界面类
 {
     Q_OBJECT
@@ -105,6 +106,8 @@ public:
 
     void WelToCho();
     void ChoToWel();
+    void WelToSet();
+    void SetToWel();
     void OverToWel();
     void Gameover(int, QColor, int, QColor, int);
     void RestartInGame();
@@ -129,6 +132,7 @@ protected:
 private:
     class WelcomeWidget* mWelWidget;
     class ChooseWidget* mChoWidget;
+    class SettingsWidget* mSetWidget;
     class OptionWidget* mOptionWidget;
     class GameoverWidget* mOverWidget;
     class EditToolWidget* mEditWidget;
@@ -174,6 +178,24 @@ private:
     QLabel* label;
 };
 
+class SettingsWidget : public QWidget{
+    Q_OBJECT
+public:
+    SettingsWidget(QWidget* parent = nullptr);
+    ~SettingsWidget();
+
+    void save();
+    static int SnakeSize, SnakeSpeed;
+    static QString UpKey, DownKey, LeftKey, RightKey;
+private:
+    QPushButton* backButton;
+    QLabel* label;
+    QFormLayout *mLayout;
+    QWidget* mEditPanel;
+    QLineEdit *sizeEdit, *speedEdit;
+    QPushButton *upEdit, *downEdit, *leftEdit, *rightEdit;
+};
+
 class GameoverWidget : public QWidget{
     Q_OBJECT
 public:
@@ -198,8 +220,5 @@ private:
     QPushButton* block, *basicfood, *speedfood, *scorefood, *lifefood, *snakebody, *generator;
     QLabel* label;
 };
-
-
-
 
 #endif // MAINWINDOW_H

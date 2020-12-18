@@ -67,7 +67,7 @@ class Snake: public Player{
 private:
     QString upKey = "w", downKey = "s", leftKey = "a", rightKey = "d";
 
-    float xVel_LastUpdated, yVel_LastUpdated;
+    float xVel_LastUpdated, yVel_LastUpdated, mVel;
 protected:
     QVector<Block*> mBlocks;
     Block* head;
@@ -83,6 +83,8 @@ protected:
 public:
     virtual void* getPtr() override{return (Snake*)this;}
 
+    void setMVel(float vel){mVel = vel;}
+
     void paint(class QPainter*) override;
     void update(int deltaTime) override;
     void processInput(QVector<QString>*)override;
@@ -97,20 +99,18 @@ public:
     void grow(int n){growNum += n;}
     void speedUp(int time);
 
-    Snake(class Game* g, float x = 0, float y = 0, int w = 50, int h = 50, QColor color = QColor(0, 0, 0));
+    Snake(class Game* g, float x = 0, float y = 0, int w = 50, int h = 50, QColor color = QColor(0, 0, 0), float vel = 250);
     virtual ~Snake() override;
 };
 
 
 class AISnake: public Snake{
-private:
-    int inteligence;
 public:
     virtual void* getPtr() override{return (AISnake*)this;}
 
     void processInput(QVector<QString>*)override;
 
-    AISnake(class Game* g, float x = 0, float y = 0, int w = 50, int h = 50, QColor color = QColor(0, 0, 0), int intel = 100);
+    AISnake(class Game* g, float x = 0, float y = 0, int w = 50, int h = 50, QColor color = QColor(0, 0, 0), float vel = 250);
     virtual ~AISnake() override;
 };
 

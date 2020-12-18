@@ -158,12 +158,11 @@ void Snake::paint(class QPainter *p){
             p->setBrush(QBrush(QColor(255, 215, 0)));
         else p->setBrush(QBrush(Qt::white));
         p->setPen(Qt::NoPen);
-        p->drawRect(int(xPos - 15) , int(yPos - 15), 10, 10);
-        p->drawRect(int(xPos + 5) , int(yPos - 15), 10, 10);
-        p->drawRect(int(xPos - 15) , int(yPos + 10), 30, 8);
-        p->drawRect(int(xPos - 15), int(yPos + 2), 8, 10);
-        p->drawRect(int(xPos + 7) , int(yPos + 2), 8, 10);
-
+        p->drawRect(int(xPos - 15*width/50) , int(yPos - 15*width/50), 10*width/50, 10*width/50);
+        p->drawRect(int(xPos + 5*width/50) , int(yPos - 15*width/50), 10*width/50, 10*width/50);
+        p->drawRect(int(xPos - 15*width/50) , int(yPos + 10*width/50), 30*width/50, 8*width/50);
+        p->drawRect(int(xPos - 15*width/50), int(yPos + 2*width/50), 8*width/50, 10*width/50);
+        p->drawRect(int(xPos + 7*width/50) , int(yPos + 2*width/50), 8*width/50, 10*width/50);
         p->restore();
     }
 
@@ -173,15 +172,15 @@ void Snake::paint(class QPainter *p){
 void Snake::update(int deltaTime){
     mTime += deltaTime;
     if (strongTime > 0) strongTime -= deltaTime;
-    updateIntv = 1000 / qAbs(xVel+yVel) * 50 ;
+    updateIntv = 1000 / qAbs(xVel+yVel) * width;
     if (speedUpTimeLast > 0){
         mTime += deltaTime;
         speedUpTimeLast -= deltaTime;
     }
     if (mTime >= updateIntv){
         deltaTime = updateIntv;
-        xPos += xVel * deltaTime / 1000;
-        yPos += yVel * deltaTime / 1000;
+        if (xVel)xPos += xVel/qAbs(xVel) * width;
+        if (yVel)yPos += yVel/qAbs(yVel) * width;
 
         xVel_LastUpdated = xVel;
         yVel_LastUpdated = yVel;
@@ -206,7 +205,7 @@ void Snake::update(int deltaTime){
         mBlocks.remove(Index, mBlocks.length() - Index);
 
         if (growNum){
-            Block* newBlock = new SnakeBody(mGame, foreX, foreY, 50, 50, mColor);
+            Block* newBlock = new SnakeBody(mGame, foreX, foreY, width, width, mColor);
             mBlocks.push_back(newBlock);
             mGame->addBlock(newBlock);
             growNum--;
@@ -239,7 +238,7 @@ void Snake::update(int deltaTime){
                     mGame->removeObject(i);
                 }
                 mBlocks.clear();
-                head = new SnakeBody(mGame, initX, initY, 50, 50, mColor);
+                head = new SnakeBody(mGame, initX, initY, width, width, mColor);
                 mBlocks.push_back(head);
                 mGame->addBlock(head);
                 xPos = initX; yPos = initY;
@@ -254,34 +253,34 @@ void Snake::update(int deltaTime){
 void Snake::processInput(QVector<QString>* vec){
     if (yVel_LastUpdated == 0){
         if (vec->contains(upKey)){
-            yVel = -250; xVel = 0;
+            yVel = -qAbs(xVel + yVel); xVel = 0;
         }
         else if(vec->contains(downKey)){
-            yVel = 250; xVel = 0;
+            yVel = qAbs(xVel + yVel); xVel = 0;
         }
     }
     if (xVel_LastUpdated == 0){
         if (vec->contains(leftKey)){
-            xVel = -250; yVel = 0;
+            xVel = -qAbs(xVel + yVel); yVel = 0;
         }
         else if (vec->contains(rightKey)){
-            xVel = 250; yVel = 0;
+            xVel = qAbs(xVel + yVel); yVel = 0;
         }
     }
 }
 
-Snake::Snake(Game* g, float x, float y, int w, int h, QColor color)
+Snake::Snake(Game* g, float x, float y, int w, int h, QColor color, float vel)
     :Player(g, x, y, w, h){
     initX = x; initY = y;
-    width = 50;
-    height = 50;
-    xVel = 250;
+    width = height = w;
+
+    mVel = xVel = vel;
     yVel = 0;
     mColor = color; paintOrder = 10;
     mType = "Snake";
     mInfo = "A hungry sn\n ake looking\n for food.";
 
-    head = new SnakeBody(mGame, xPos, yPos, 50, 50, mColor);
+    head = new SnakeBody(mGame, xPos, yPos, width, width, mColor);
     mBlocks.push_back(head);
 
     for(auto i : mBlocks){
@@ -304,9 +303,8 @@ void Snake::speedUp(int time){
     speedUpTimeLast = time;
 }
 
-AISnake::AISnake(class Game* g, float x, float y, int w, int h, QColor color, int intel)
-    :Snake(g, x, y, w, h, color){
-    inteligence = intel;
+AISnake::AISnake(class Game* g, float x, float y, int w, int h, QColor color, float vel)
+    :Snake(g, x, y, w, h, color, vel){
     mType = "AISnake";
     mInfo = "AI control\n ed snake";
 }
@@ -314,6 +312,7 @@ AISnake::AISnake(class Game* g, float x, float y, int w, int h, QColor color, in
 void AISnake::processInput(QVector<QString> *){
     QVector<Prop*> props = *mGame->getProps();
     QVector<Block*> blocks = *mGame->getBlocks();
+    float v = qAbs(xVel + yVel);
     if (props.length() > 0 && blocks.length() > 0){
         int dis = (props[0]->getX() - xPos)*(props[0]->getX() - xPos) + (props[0]->getY() - yPos)*(props[0]->getY() - yPos);
         int tar = 0;
@@ -325,32 +324,32 @@ void AISnake::processInput(QVector<QString> *){
             }
 
         bool flagRight = false, flagLeft = false, flagUp = false, flagDown = false;
-        for(auto i: blocks)if (qAbs(i->getY() - yPos)*2 < height + i->getH() && qAbs(i->getX() - xPos - 50)*2 < i->getW() + width){ flagRight = true; break;}
-        for(auto i: blocks)if (qAbs(i->getY() - yPos)*2 < height + i->getH() && qAbs(i->getX() - xPos + 50)*2 < i->getW() + width){ flagLeft = true; break;}
-        for(auto i: blocks)if (qAbs(i->getY() - yPos + 50)*2 < height + i->getH() && qAbs(i->getX() - xPos)*2 < i->getW() + width){ flagUp = true; break;}
-        for(auto i: blocks)if (qAbs(i->getY() - yPos - 50)*2 < height + i->getH() && qAbs(i->getX() - xPos)*2 < i->getW() + width){ flagDown = true; break;}
+        for(auto i: blocks)if (qAbs(i->getY() - yPos)*2 < height + i->getH() && qAbs(i->getX() - xPos - width)*2 < i->getW() + width){ flagRight = true; break;}
+        for(auto i: blocks)if (qAbs(i->getY() - yPos)*2 < height + i->getH() && qAbs(i->getX() - xPos + width)*2 < i->getW() + width){ flagLeft = true; break;}
+        for(auto i: blocks)if (qAbs(i->getY() - yPos + width)*2 < height + i->getH() && qAbs(i->getX() - xPos)*2 < i->getW() + width){ flagUp = true; break;}
+        for(auto i: blocks)if (qAbs(i->getY() - yPos - width)*2 < height + i->getH() && qAbs(i->getX() - xPos)*2 < i->getW() + width){ flagDown = true; break;}
 
         if (props[tar]->getX() > xPos + width/2){
-            if(!flagRight){xVel = 250; yVel = 0;}
+            if(!flagRight){xVel = v; yVel = 0;}
             else{
-                if (props[tar]->getY() > yPos && !flagDown){xVel = 0;yVel = 250;}
-                else if (!flagUp){xVel = 0; yVel = -250;}
-                else {xVel = -250;yVel = 0;}
+                if (props[tar]->getY() > yPos && !flagDown){xVel = 0;yVel = v;}
+                else if (!flagUp){xVel = 0; yVel = -v;}
+                else {xVel = -v;yVel = 0;}
             }
         }
         else if(props[tar]->getX() < xPos - width/2){
-            if(!flagLeft){xVel = -250; yVel = 0;}
+            if(!flagLeft){xVel = -v; yVel = 0;}
             else{
-                if (props[tar]->getY() > yPos && !flagDown){xVel = 0;yVel = 250;}
-                else if (!flagUp){xVel = 0; yVel = -250;}
-                else {xVel = 250;yVel = 0;}
+                if (props[tar]->getY() > yPos && !flagDown){xVel = 0;yVel = v;}
+                else if (!flagUp){xVel = 0; yVel = -v;}
+                else {xVel = v;yVel = 0;}
             }
         }
         else{
-            if (props[tar]->getY() > yPos && !flagDown){xVel = 0;yVel = 250;}
-            else if (!flagUp){xVel = 0; yVel = -250;}
-            else if (!flagLeft){xVel = -250;yVel = 0;}
-            else {xVel = 250;yVel = 0;}
+            if (props[tar]->getY() > yPos && !flagDown){xVel = 0;yVel = v;}
+            else if (!flagUp){xVel = 0; yVel = -v;}
+            else if (!flagLeft){xVel = -v;yVel = 0;}
+            else {xVel = v;yVel = 0;}
         }
     }
 }

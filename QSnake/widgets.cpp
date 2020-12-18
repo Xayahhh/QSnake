@@ -10,6 +10,13 @@
 #include "Maps.h"
 #include <QKeyEvent>
 
+QString SettingsWidget::UpKey = "w";
+QString SettingsWidget::DownKey = "s";
+QString SettingsWidget::LeftKey = "a";
+QString SettingsWidget::RightKey = "d";
+int SettingsWidget::SnakeSize = 50;
+int SettingsWidget::SnakeSpeed = 250;
+
 GameWidget::GameWidget(QWidget *parent)  //游戏组件的初始化，目前还很粗糙
     : QScrollArea(parent)
 {
@@ -43,8 +50,6 @@ void GameWidget::Initialize(QString gameToStart){
 
     if (gameToStart == "QSnake-Single")
         mMap = new Map_Snake_1(this, this);
-    else if (gameToStart == "Jumpy-Single")
-        mMap = new Map_First(this, this);
     else if (gameToStart == "QSnake-Multi")
         mMap = new Map_Snake_2(this, this);
     else if (gameToStart == "QSnake-AI")
@@ -78,6 +83,7 @@ void GameWidget::keyPressEvent(QKeyEvent *k){
     }
     QWidget::keyPressEvent(k);
 }
+
 void GameWidget::keyReleaseEvent(QKeyEvent *k){
     if (k->text().length()>0)
         emit(keyReleaseSignal(k->text()));
@@ -160,7 +166,6 @@ void InfoWidget::removeObject(class Object *obj){
     mObjects.removeOne(obj);
 }
 
-
 InfoWidget::~InfoWidget(){
 }
 
@@ -205,8 +210,6 @@ void InfoWidget::paintEvent(QPaintEvent*){
     for (auto i: mObjects)
         i->paint(&p);
 }
-
-
 
 
 MainWindow::MainWindow(QWidget *parent)  //没用
@@ -260,11 +263,11 @@ MainWindow::MainWindow(QWidget *parent)  //没用
 
     mWelWidget = new WelcomeWidget(this);
     mChoWidget = new ChooseWidget(this);
+    mSetWidget = new SettingsWidget(this);
     mOptionWidget = new OptionWidget(this);
     mOverWidget = new GameoverWidget(this);
     mEditWidget = new EditToolWidget(this);
 }
-
 
 void MainWindow::StartGameSingle(){
 
@@ -395,6 +398,17 @@ void MainWindow::ChoToWel(){
     mWelWidget->show();
 }
 
+void MainWindow::WelToSet(){
+    mWelWidget->hide();
+    mSetWidget->show();
+}
+
+void MainWindow::SetToWel(){
+    mSetWidget->hide();
+    mWelWidget->show();
+
+    mSetWidget->save();
+}
 
 void MainWindow::OverToWel(){
     mOverWidget->hide();
@@ -432,7 +446,6 @@ void MainWindow::RestartOutOfGame(){
     mGameWidget->setFocus();
     isStarted = true;
 }
-
 
 void MainWindow::keyPressEvent(QKeyEvent* k){
     if (k->key() == Qt::Key_Escape && isStarted){
@@ -477,6 +490,7 @@ WelcomeWidget::WelcomeWidget(QWidget* parent)
 
     settingButton->move(325, 700);
     settingButton->resize(700, 150);
+    connect(settingButton, &QPushButton::clicked, static_cast<MainWindow*>(parent), &MainWindow::WelToSet);
 
     exitButton->move(1190, 0);
     exitButton->resize(160, 120);
@@ -632,6 +646,93 @@ ChooseWidget::ChooseWidget(QWidget* parent)
 ChooseWidget::~ChooseWidget(){
 
 }
+
+SettingsWidget::SettingsWidget(QWidget* parent)
+    :QWidget(parent){
+    resize(1350, 1000);
+
+    QFont font;
+    font.setFamily("Bulletproof BB");
+    font.setPixelSize(140);
+    font.setLetterSpacing(QFont::AbsoluteSpacing, 0);
+
+    label = new QLabel("Settings",this);
+    label->move(320, 50);
+    label->resize(1000, 200);
+    label->setFont(font);
+
+    backButton = new QPushButton("<<<", this);
+    backButton->move(0, 0);
+    backButton->resize(160, 120);
+    connect(backButton, &QPushButton::clicked, static_cast<MainWindow*>(parent), &MainWindow::SetToWel);
+
+    mEditPanel = new QWidget(this);
+    mEditPanel->resize(750, 750);
+    mEditPanel->move(300, 250);
+    mLayout = new QFormLayout(mEditPanel);
+
+    sizeEdit = new QLineEdit(QString::number(SnakeSize), mEditPanel);
+    mLayout->addRow("Snake Size:", sizeEdit);
+    speedEdit = new QLineEdit(QString::number(SnakeSpeed), mEditPanel);
+    mLayout->addRow("Snake Speed:", speedEdit);
+    upEdit = new QPushButton(UpKey, mEditPanel);
+    mLayout->addRow("Up Key:", upEdit);
+    downEdit = new QPushButton(DownKey, mEditPanel);
+    mLayout->addRow("Down Key:", downEdit);
+    leftEdit = new QPushButton(LeftKey, mEditPanel);
+    mLayout->addRow("Left Key:", leftEdit);
+    rightEdit = new QPushButton(RightKey, mEditPanel);
+    mLayout->addRow("Right Key:", rightEdit);
+
+    mEditPanel->setLayout(mLayout);
+    mEditPanel->setStyleSheet(
+                "QLabel{"
+                " font-family: 'Bulletproof BB';"
+                " font-size: 60px;"
+                "}"
+                "QLineEdit{"
+                " border: 0px;"
+                " background: transparent;"
+                " border-bottom:5px solid black;"
+                " padding-left: 90px;"
+                " font-family: 'Bulletproof BB';"
+                " font-size: 60px;"
+                "}"
+                );
+    setStyleSheet(""
+                  "QPushButton:hover{"
+                  "background:#FFFFFF;"
+                  " border:10px solid #000000;"
+                  " padding: 0px; "
+                  " color: #000000; "
+                  " font-family: 'Bulletproof BB';"
+                  " font-size: 80px;"
+                  "}"
+                  "QPushButton{"
+                  "background:#000000;"
+                  " border:10px solid #AAAAAA;"
+                  " padding: 0px; "
+                  " color: #FFFFFF; "
+                  " font-family: 'Bulletproof BB';"
+                  " font-size: 80px;"
+                  "}"
+                  );
+    hide();
+}
+
+void SettingsWidget::save(){
+    SnakeSize = sizeEdit->text().toInt();
+    SnakeSpeed = speedEdit->text().toInt();
+    UpKey = upEdit->text();
+    DownKey = downEdit->text();
+    LeftKey = leftEdit->text();
+    RightKey = rightEdit->text();
+}
+
+SettingsWidget::~SettingsWidget(){
+
+}
+
 
 void GameoverWidget::setScore(int scoreNum, QColor color1, int score1, QColor color2, int score2){
     if (scoreNum == 1){

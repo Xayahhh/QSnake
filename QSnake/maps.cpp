@@ -20,7 +20,6 @@ Map::~Map(){
 }
 
 
-
 Map_Hi::Map_Hi(QWidget* parent, GameWidget* gameWidget)
     :Map(parent, gameWidget){
     mPlayer = new Player(mGame);
@@ -80,11 +79,10 @@ Map_Snake_Plain::Map_Snake_Plain(QWidget* parent, GameWidget* gameWidget)
 Map_Snake_1::Map_Snake_1(QWidget* parent, GameWidget* gameWidget)
     :Map(parent, gameWidget){
 
-    mPlayer = new Snake(mGame, 500, 500);
+    mPlayer = new Snake(mGame, 500, 500, SettingsWidget::SnakeSize, SettingsWidget::SnakeSize, QColor(0, 0, 0), SettingsWidget::SnakeSpeed);
     mGame->addBeing(mPlayer);
     mGame->addPlayer(mPlayer);
-    static_cast<Snake*>(mPlayer)->setKeys("Up", "Down", "Left", "Right");
-
+    static_cast<Snake*>(mPlayer)->setKeys(SettingsWidget::UpKey, SettingsWidget::DownKey, SettingsWidget::LeftKey, SettingsWidget::RightKey);
     resize(1600, 1600);
 
     mGame->addBlock(new Block(mGame, 800, 1525, 1600, 200, QColor(60, 40, 40)));
@@ -100,14 +98,14 @@ Map_Snake_1::Map_Snake_1(QWidget* parent, GameWidget* gameWidget)
 Map_Snake_2::Map_Snake_2(QWidget* parent, GameWidget* gameWidget)
     :Map(parent, gameWidget){
 
-    mPlayer = new Snake(mGame, 300, 300, 50, 50, QColor(130, 180, 255));
+    mPlayer = new Snake(mGame, 300, 300, SettingsWidget::SnakeSize, SettingsWidget::SnakeSize, QColor(130, 180, 255), SettingsWidget::SnakeSpeed);
     mGame->addBeing(mPlayer);
     mGame->addPlayer(mPlayer);
+    static_cast<Snake*>(mPlayer)->setKeys(SettingsWidget::UpKey, SettingsWidget::DownKey, SettingsWidget::LeftKey, SettingsWidget::RightKey);
 
-    mPlayer = new Snake(mGame, 700, 700, 50, 50, QColor(255, 180, 145));
+    mPlayer = new Snake(mGame, 700, 700, SettingsWidget::SnakeSize, SettingsWidget::SnakeSize, QColor(255, 180, 145), SettingsWidget::SnakeSpeed);
     mGame->addBeing(mPlayer);
     mGame->addPlayer(mPlayer);
-    mPlayer->setVel(-250, 0);
 
     static_cast<Snake*>(mPlayer)->setKeys("Up", "Down", "Left", "Right");
 
@@ -124,11 +122,11 @@ Map_Snake_2::Map_Snake_2(QWidget* parent, GameWidget* gameWidget)
 Map_Snake_3::Map_Snake_3(QWidget* parent, GameWidget* gameWidget)
     :Map(parent, gameWidget){
 
-    mPlayer = new Snake(mGame, 300, 300, 50, 50, QColor(130, 180, 255));
+    mPlayer = new Snake(mGame, 300, 300, SettingsWidget::SnakeSize, SettingsWidget::SnakeSize, QColor(130, 180, 255), SettingsWidget::SnakeSpeed);
     mGame->addBeing(mPlayer);
     mGame->addPlayer(mPlayer);
 
-    mPlayer = new AISnake(mGame, 700, 700, 50, 50, QColor(255, 180, 145));
+    mPlayer = new AISnake(mGame, 700, 700, SettingsWidget::SnakeSize, SettingsWidget::SnakeSize, QColor(255, 180, 145), SettingsWidget::SnakeSpeed);
     mGame->addBeing(mPlayer);
     mGame->addPlayer(mPlayer);
 

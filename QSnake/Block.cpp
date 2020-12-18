@@ -119,7 +119,7 @@ FoodGenerator::FoodGenerator(Game* g, int md, float x, float y, int w, int h, QC
     paintOrder = 5;
     maxDistance = md;
 
-    addBasicFood();addBasicFood();addBasicFood();
+    mGame->removeObject(LTSC);mGame->removeObject(RTSC);mGame->removeObject(LBSC);mGame->removeObject(RBSC);
 }
 
 FoodGenerator::~FoodGenerator(){
@@ -127,6 +127,9 @@ FoodGenerator::~FoodGenerator(){
 }
 
 void FoodGenerator::update(int deltaTime){
+    if (mTime == 0){
+        addBasicFood();addBasicFood();addBasicFood();
+    }
     mTime += deltaTime;
     luTime += deltaTime;
     suTime += deltaTime;
